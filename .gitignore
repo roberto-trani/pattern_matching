@@ -1,0 +1,5 @@
+*.pyc
+*.so
+pattern_matcher.cpp
+segmenter.cpp
+build/
