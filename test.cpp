@@ -64,10 +64,10 @@ test2() {
     const size_t seq_n_repetitions = 3 * 3;
     const size_t num_restrictions = 20;
 
-    static_assert(num_chars > 0);
-    static_assert(seq_n_repetitions > 0);
-    static_assert(seq_n_repetitions % 3 == 0);
-    static_assert(num_restrictions > 0);
+    static_assert(num_chars > 0, "num_chars must be greater than 0");
+    static_assert(seq_n_repetitions > 0, "seq_n_repetitions must be greater than 0");
+    static_assert(seq_n_repetitions % 3 == 0, "seq_n_repetitions must be a multiple of 3");
+    static_assert(num_restrictions > 0, "num_restrictions must be greater than 0");
 
     // create a list of matches and the map pattern to length
     char testString[seq_n_repetitions * num_chars * 2];

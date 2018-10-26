@@ -40,7 +40,7 @@ public:
             throw std::runtime_error("This pattern has been already inserted");
         }
         // create the DataBlock using the BufferManager
-        MyString pattern_block = this->buffer_manager.createDataBlock<char>(&pattern[0], pattern.size());
+        MyString pattern_block = this->buffer_manager.createDataBlock(&pattern[0], pattern.size());
 
         pattern_length_t num_words = 0;
         for (size_t marker_pos = 0, space_pos = 0, max_space_pos = pattern_block.size();
