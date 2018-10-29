@@ -13,7 +13,7 @@ def add_extension(name, **kwargs):
     assert isinstance(name, str) and "/" not in name
     assert name not in extensions
 
-    source = name.replace(".", "/") + ".pyx"
+    source = name.split(".")[-1] + ".pyx"
     if "language" not in kwargs:
         kwargs["language"] = "c++"
     if "extra_compile_args" in kwargs:
@@ -28,12 +28,11 @@ def add_extension(name, **kwargs):
     )
 
 # configure the extensions
-add_extension('pattern_matcher')
-add_extension('segmenter')
+add_extension('pattern_matching.pattern_matcher')
+add_extension('pattern_matching.segmenter')
 
 # setup
 setup(
-    name='pattern_matching',
     ext_modules=cythonize(extensions.values()),
     packages=extensions.keys(),
 )
