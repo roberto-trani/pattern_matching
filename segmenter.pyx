@@ -18,7 +18,8 @@ cdef class PySegmenter(object):
     def __cinit__(
             self,
             set segments_set,
-            dict segments_stats,
+            dict segment_to_phrase_freq,
+            dict segment_to_and_freq,
             double min_segmentation_probability,
             long min_segmentation_freq,
             debug=False
@@ -28,13 +29,18 @@ cdef class PySegmenter(object):
             print "Fetching segments to use for the segmentation"
         assert min_segmentation_probability >= 0 or min_segmentation_probability == -1
         assert min_segmentation_freq >= 0
+        segment_to_and_freq = dict(
+            (" ".join(sorted(segment.split())) if " " in segment else segment, freq)
+            for segment, freq in segment_to_and_freq.iteritems()
+        )
+
         if min_segmentation_probability == -1:
             segments_freqs = tuple(
                 (segment, phrase_freq)
                 for segment, segment_length, (phrase_freq, and_freq) in (
-                    (segment, len(segment.split()) if "  " in segment else (segment.count(" ")+1), get_segment_details(segment, segments_stats))
+                    (segment, len(segment.split()) if "  " in segment else (segment.count(" ")+1), get_segment_details(segment, segment_to_phrase_freq, segment_to_and_freq))
                     for segment in segments_set
-                    if " " in segment  # are we sure we want only multi-terms segments he$
+                    if " " in segment  # are we sure we want only multi-terms segments here?
                 )
                 if phrase_freq >= min_segmentation_freq
                 and (segment_length ** segment_length) * phrase_freq >= and_freq
@@ -43,7 +49,7 @@ cdef class PySegmenter(object):
             segments_freqs = tuple(
                 (segment, phrase_freq)
                 for segment, (phrase_freq, and_freq) in (
-                    (segment, get_segment_details(segment, segments_stats))
+                    (segment, get_segment_details(segment, segment_to_phrase_freq, segment_to_and_freq))
                     for segment in segments_set
                     if " " in segment  # are we sure we want only multi-terms segments here?
                 )
@@ -222,9 +228,9 @@ cdef class PySegmenter(object):
             raise ValueError("text must be a string or a list of strings (related to different rows of the same document)")
 
 
-cdef get_segment_details(str segment, dict segment_to_freq):
+cdef get_segment_details(str segment, dict segment_to_phrase_freq, dict segment_to_and_freq):
     if " " in segment:
-        return (segment_to_freq["\"{}\"".format(segment)], segment_to_freq[" ".join(sorted(segment.split()))])
+        return (segment_to_phrase_freq[segment], segment_to_and_freq[" ".join(sorted(segment.split()))])
     else:
-        freq = segment_to_freq[segment]
+        freq = segment_to_phrase_freq[segment]
         return (freq, freq)
